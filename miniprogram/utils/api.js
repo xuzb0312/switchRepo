@@ -23,16 +23,26 @@ function getGames(params = {}) {
   return request('/games', params)
 }
 
-function getGameDetail(id) {
-  return request(`/games/${id}`)
+function getGameDetail(id, userId) {
+  let url = `/games/${id}`
+  if (userId) url += `?userId=${userId}`
+  return request(url)
 }
 
 function login(code) {
   return request('/auth/login', { code }, 'POST')
 }
 
-function getUserInfo() {
-  return request('/user/info')
+function getUserInfo(userId) {
+  return request('/auth/userinfo', { userId })
+}
+
+function checkUnlock(userId, gameId) {
+  return request('/unlock/check', { userId, gameId })
+}
+
+function unlockGame(userId, gameId, adType = 'rewarded') {
+  return request('/unlock', { userId, gameId, adType }, 'POST')
 }
 
 module.exports = {
@@ -40,5 +50,7 @@ module.exports = {
   getGames,
   getGameDetail,
   login,
-  getUserInfo
+  getUserInfo,
+  checkUnlock,
+  unlockGame
 }

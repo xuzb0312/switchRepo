@@ -11,19 +11,25 @@ Page({
   },
 
   onLoad() {
-    // 模拟已登录状态
-    this.setData({
-      userInfo: {
-        nickname: '游戏玩家',
-        avatar: 'https://picsum.photos/100/100?random=100',
-        level: 1
-      },
-      stats: {
-        gameCount: 5,
-        downloadCount: 12,
-        shareCount: 3
-      }
-    })
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+      this.setData({ 
+        userInfo,
+        stats: {
+          gameCount: userInfo.gameCount || 5,
+          downloadCount: userInfo.downloadCount || 12,
+          shareCount: userInfo.shareCount || 3
+        }
+      })
+    }
+  },
+
+  onShow() {
+    // 每次显示时刷新
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+      this.setData({ userInfo })
+    }
   },
 
   onLogin() {
@@ -33,15 +39,29 @@ Page({
           try {
             const result = await login(res.code)
             if (result.data) {
+              // 保存用户信息
+              wx.setStorageSync('userInfo', result.data)
               this.setData({ userInfo: result.data })
+              wx.showToast({ title: '登录成功', icon: 'success' })
             }
           } catch (e) {
-            // 模拟登录成功
-            this.setData({
-              userInfo: {
-                nickname: '玩家' + Math.floor(Math.random() * 1000),
-                avatar: 'https://picsum.photos/100/100?random=100',
-                level: 1
+            // 模拟登录
+            const mockUser = {
+              id: 1,
+              nickname: '游戏玩家',
+              avatar: 'https://picsum.photos/100/100?random=100',
+              level: 1,
+              gameCount: 5,
+              downloadCount: 12,
+              shareCount: 3
+            }
+            wx.setStorageSync('userInfo', mockUser)
+            this.setData({ 
+              userInfo: mockUser,
+              stats: {
+                gameCount: 5,
+                downloadCount: 12,
+                shareCount: 3
               }
             })
             wx.showToast({ title: '登录成功', icon: 'success' })
@@ -57,6 +77,7 @@ Page({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
+          wx.removeStorageSync('userInfo')
           this.setData({ userInfo: null })
           wx.showToast({ title: '已退出', icon: 'none' })
         }

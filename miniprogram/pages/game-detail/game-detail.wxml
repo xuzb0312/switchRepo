@@ -8,40 +8,60 @@
     <view class="tags">
       <text class="tag">{{game.platform}}</text>
       <text class="tag" wx:if="{{game.type}}">{{game.type}}</text>
+      <text class="tag view-count">👁 {{game.viewCount || 0}}</text>
     </view>
   </view>
 
-  <!-- 游戏简介 -->
-  <view class="card" wx:if="{{game.description}}">
-    <text class="card-title">游戏简介</text>
-    <text class="desc">{{game.description}}</text>
-  </view>
+  <!-- 已解锁：显示全部内容 -->
+  <block wx:if="{{unlocked}}">
+    <!-- 游戏简介 -->
+    <view class="card" wx:if="{{game.description}}">
+      <text class="card-title">游戏简介</text>
+      <text class="desc">{{game.description}}</text>
+    </view>
 
-  <!-- 下载链接 -->
-  <view class="card" wx:if="{{game.downloadLinks && game.downloadLinks.length > 0}}">
-    <text class="card-title">下载链接</text>
-    <view class="download-list">
-      <view class="download-item" wx:for="{{game.downloadLinks}}" wx:key="id">
-        <view class="link-info">
-          <text class="link-type">{{item.type}}</text>
-          <text class="link-name">{{item.name || item.url}}</text>
+    <!-- 下载链接 -->
+    <view class="card" wx:if="{{game.downloadLinks && game.downloadLinks.length > 0}}">
+      <text class="card-title">下载链接</text>
+      <view class="download-list">
+        <view class="download-item" wx:for="{{game.downloadLinks}}" wx:key="id">
+          <view class="link-info">
+            <text class="link-type">{{item.type}}</text>
+            <text class="link-name">{{item.name || item.url}}</text>
+          </view>
+          <view class="btn-copy" bindtap="copyLink" data-url="{{item.url}}">复制链接</view>
         </view>
-        <view class="btn-copy" bindtap="copyLink" data-url="{{item.url}}">复制链接</view>
       </view>
     </view>
-  </view>
 
-  <!-- 截图预览 -->
-  <view class="card" wx:if="{{game.images && game.images.length > 0}}">
-    <text class="card-title">截图预览</text>
-    <scroll-view scroll-x class="screenshots">
-      <image wx:for="{{game.images}}" wx:key="index" 
-             src="{{item}}" mode="aspectFill" 
-             class="screenshot" 
-             bindtap="previewImage" 
-             data-src="{{item}}" />
-    </scroll-view>
-  </view>
+    <!-- 截图预览 -->
+    <view class="card" wx:if="{{game.images && game.images.length > 0}}">
+      <text class="card-title">截图预览</text>
+      <scroll-view scroll-x class="screenshots">
+        <image wx:for="{{game.images}}" wx:key="index" 
+               src="{{item}}" mode="aspectFill" 
+               class="screenshot" 
+               bindtap="previewImage" 
+               data-src="{{item}}" />
+      </scroll-view>
+    </view>
+  </block>
+
+  <!-- 未解锁：显示解锁提示 -->
+  <block wx:else>
+    <view class="card lock-card">
+      <view class="lock-icon">🔒</view>
+      <text class="lock-title">此页面已加密</text>
+      <text class="lock-desc">观看一个广告即可解锁下载链接</text>
+      <view class="btn-unlock" bindtap="watchAd">📺 观看广告解锁</view>
+    </view>
+    
+    <!-- 隐藏部分预览（模糊） -->
+    <view class="card preview-card">
+      <text class="card-title">游戏简介</text>
+      <text class="desc blurred">{{game.description || '暂无简介'}}</text>
+    </view>
+  </block>
 </view>
 
 <!-- 加载状态 -->

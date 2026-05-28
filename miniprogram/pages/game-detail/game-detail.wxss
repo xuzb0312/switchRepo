@@ -23,6 +23,24 @@
   margin-bottom: 16rpx;
 }
 
+.tags {
+  display: flex;
+  gap: 12rpx;
+}
+
+.tag {
+  background: #2a2a2a;
+  color: #FFD700;
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.view-count {
+  color: #888;
+  background: #1e1e1e;
+}
+
 .card {
   background: #1e1e1e;
   border-radius: 16rpx;
@@ -96,6 +114,49 @@
   border-radius: 12rpx;
   margin-right: 16rpx;
   display: inline-block;
+}
+
+/* 解锁卡片 */
+.lock-card {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.lock-icon {
+  font-size: 100rpx;
+  margin-bottom: 30rpx;
+}
+
+.lock-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFD700;
+  margin-bottom: 16rpx;
+}
+
+.lock-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #888;
+  margin-bottom: 40rpx;
+}
+
+.btn-unlock {
+  background: #FFD700;
+  color: #1a1a1a;
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 24rpx 60rpx;
+  border-radius: 40rpx;
+  display: inline-block;
+}
+
+/* 模糊预览 */
+.preview-card .desc.blurred {
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
 }
 
 .loading {

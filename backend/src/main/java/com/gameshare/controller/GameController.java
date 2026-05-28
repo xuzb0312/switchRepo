@@ -1,5 +1,6 @@
 package com.gameshare.controller;
 
+import com.gameshare.dto.Result;
 import com.gameshare.entity.Game;
 import com.gameshare.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,14 @@ public class GameController {
 
     @GetMapping
     public Result<List<Game>> list(@RequestParam(required = false) String platform,
-                                    @RequestParam(required = false) String keyword) {
+                                   @RequestParam(required = false) String keyword) {
         return Result.success(gameService.listGames(platform, keyword));
     }
 
     @GetMapping("/{id}")
-    public Result<Game> detail(@PathVariable Long id) {
-        return Result.success(gameService.getGameDetail(id));
+    public Result<Game> detail(@PathVariable Long id,
+                               @RequestParam(required = false) Long userId) {
+        return Result.success(gameService.getGameDetail(id, userId));
     }
 
     @PostMapping
@@ -32,7 +34,8 @@ public class GameController {
     }
 
     @PutMapping("/{id}")
-    public Result<Void> update(@RequestBody Game game) {
+    public Result<Void> update(@PathVariable Long id, @RequestBody Game game) {
+        game.setId(id);
         gameService.updateGame(game);
         return Result.success();
     }
@@ -41,18 +44,5 @@ public class GameController {
     public Result<Void> delete(@PathVariable Long id) {
         gameService.deleteGame(id);
         return Result.success();
-    }
-}
-
-class Result<T> {
-    public int code;
-    public String msg;
-    public T data;
-    public static <T> Result<T> success(T data) {
-        Result<T> r = new Result<>();
-        r.code = 200;
-        r.msg = "success";
-        r.data = data;
-        return r;
     }
 }
