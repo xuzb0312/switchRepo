@@ -87,6 +87,20 @@
     .link-item { display: flex; gap: 10px; align-items: center; background: #2a2a2a; padding: 10px; border-radius: 8px; }
     .link-item input { flex: 1; background: #1e1e1e; }
     
+    /* 截图输入 */
+    .screenshots-container { display: flex; flex-direction: column; gap: 12px; }
+    .screenshot-item { display: flex; gap: 10px; align-items: center; background: #2a2a2a; padding: 10px; border-radius: 8px; }
+    .screenshot-item input { flex: 1; background: #1e1e1e; }
+    .screenshot-item .sort-handle { color: #666; cursor: grab; padding: 0 8px; font-size: 18px; }
+    .screenshot-item .preview-img { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; background: #1e1e1e; }
+    .screenshots-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .screenshot-thumb { display: flex; gap: 10px; align-items: center; background: #252525; padding: 8px 12px; border-radius: 8px; }
+    .screenshot-thumb img { width: 80px; height: 50px; object-fit: cover; border-radius: 4px; }
+    .screenshot-thumb .info { flex: 1; font-size: 13px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .screenshot-thumb button { background: none; border: none; color: #666; cursor: pointer; font-size: 18px; }
+    .screenshot-thumb button:hover { color: #f87171; }
+    .screenshot-thumb .drag-handle { color: #666; cursor: grab; font-size: 16px; }
+    
     /* Toast */
     .toast { position: fixed; top: 80px; right: 30px; background: #1e1e1e; border-left: 4px solid #FFD700; padding: 16px 24px; border-radius: 8px; display: none; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
     .toast.show { display: block; }
@@ -239,6 +253,18 @@
             </div>
           </div>
         </div>
+        <div class="form-group">
+          <label>游戏截图</label>
+          <div class="screenshots-container">
+            <div class="screenshot-item">
+              <span class="sort-handle">⋮⋮</span>
+              <input type="text" placeholder="截图URL" class="screenshot-url" style="flex:2">
+              <input type="number" placeholder="排序" value="0" class="screenshot-sort" style="width:70px">
+              <button class="btn btn-secondary" onclick="addScreenshotInput()">+</button>
+            </div>
+          </div>
+          <div class="screenshots-list" id="screenshotsList"></div>
+        </div>
         <button class="btn btn-primary" style="width:100%" onclick="saveGame()">保存</button>
       </div>
     </div>
@@ -381,6 +407,17 @@
           <button class="btn btn-secondary" onclick="addLinkInput()">+</button>
         </div>
       `;
+      // 重置截图输入
+      document.querySelector('.screenshots-container').innerHTML = `
+        <div class="screenshot-item">
+          <span class="sort-handle">⋮⋮</span>
+          <input type="text" placeholder="截图URL" class="screenshot-url" style="flex:2">
+          <input type="number" placeholder="排序" value="0" class="screenshot-sort" style="width:70px">
+          <button class="btn btn-secondary" onclick="addScreenshotInput()">+</button>
+        </div>
+      `;
+      screenshotsCache = [];
+      document.getElementById('screenshotsList').innerHTML = '';
       
       if (id) {
         document.getElementById('gameModalTitle').textContent = '编辑游戏';
@@ -395,6 +432,8 @@
           document.getElementById('gameStatus').value = game.status;
           // 加载下载链接
           loadGameLinks(game.id);
+          // 加载截图
+          loadGameScreenshots(game.id);
         }
       } else {
         document.getElementById('gameModalTitle').textContent = '添加游戏';
@@ -450,6 +489,97 @@
       container.appendChild(newItem);
     }
     
+    // 截图管理
+    let screenshotsCache = [];
+    
+    function addScreenshotInput() {
+      const container = document.querySelector('.screenshots-container');
+      const lastItem = container.querySelector('.screenshot-item:last-child');
+      if (lastItem) {
+        lastItem.querySelector('.btn-secondary').textContent = '×';
+        lastItem.querySelector('.btn-secondary').className = 'btn btn-danger';
+        lastItem.querySelector('.btn-secondary').onclick = function() { this.parentElement.remove(); };
+      }
+      const newItem = document.createElement('div');
+      newItem.className = 'screenshot-item';
+      newItem.innerHTML = `
+        <span class="sort-handle">⋮⋮</span>
+        <input type="text" placeholder="截图URL" class="screenshot-url" style="flex:2">
+        <input type="number" placeholder="排序" value="0" class="screenshot-sort" style="width:70px">
+        <button class="btn btn-secondary" onclick="addScreenshotInput()">+</button>
+      `;
+      container.appendChild(newItem);
+    }
+    
+    // 加载游戏截图
+    async function loadGameScreenshots(gameId) {
+      try {
+        const res = await fetch(`${API_BASE}/games/${gameId}`);
+        const json = await res.json();
+        screenshotsCache = json.data.images || [];
+        renderScreenshotsList();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    function renderScreenshotsList() {
+      const container = document.getElementById('screenshotsList');
+      if (screenshotsCache.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = '<div style="color:#666;font-size:13px;margin-bottom:8px;">已有截图（可拖拽排序）</div>' + 
+        screenshotsCache.map((url, index) => `
+          <div class="screenshot-thumb" draggable="true" data-index="${index}">
+            <span class="drag-handle">⋮⋮</span>
+            <img src="${url}" onerror="this.src='https://picsum.photos/80/50'">
+            <span class="info">${url}</span>
+            <button onclick="removeScreenshot(${index})" title="删除">×</button>
+          </div>
+        `).join('');
+      
+      // 添加拖拽排序
+      container.querySelectorAll('.screenshot-thumb').forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('drop', handleDrop);
+        item.addEventListener('dragend', handleDragEnd);
+      });
+    }
+    
+    function removeScreenshot(index) {
+      screenshotsCache.splice(index, 1);
+      renderScreenshotsList();
+    }
+    
+    let draggedIndex = null;
+    
+    function handleDragStart(e) {
+      draggedIndex = parseInt(e.target.dataset.index);
+      e.target.style.opacity = '0.5';
+    }
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      const dropIndex = parseInt(e.target.closest('.screenshot-thumb').dataset.index);
+      if (draggedIndex !== null && draggedIndex !== dropIndex) {
+        const temp = screenshotsCache[draggedIndex];
+        screenshotsCache.splice(draggedIndex, 1);
+        screenshotsCache.splice(dropIndex, 0, temp);
+        renderScreenshotsList();
+      }
+    }
+    
+    function handleDragEnd(e) {
+      e.target.style.opacity = '1';
+      draggedIndex = null;
+    }
+    
     // 保存游戏
     async function saveGame() {
       const id = document.getElementById('gameId').value;
@@ -468,27 +598,46 @@
       }
       
       try {
+        let gameId = id;
         if (id) {
           await fetch(`${API_BASE}/games/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(game)
           });
-          showToast('更新成功', 'success');
         } else {
-          await fetch(`${API_BASE}/games`, {
+          const res = await fetch(`${API_BASE}/games`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(game)
           });
-          showToast('添加成功', 'success');
+          const json = await res.json();
+          gameId = json.data?.id;
         }
         
-        // 保存下载链接（简化处理）
+        // 保存截图
+        const newScreenshots = [];
+        document.querySelectorAll('.screenshot-url').forEach((input, i) => {
+          const url = input.value.trim();
+          if (url) {
+            newScreenshots.push({ url, sort: i });
+          }
+        });
+        // 合并已有截图（已排序）
+        const allScreenshots = [...screenshotsCache.map(url => ({ url })), ...newScreenshots];
+        if (allScreenshots.length > 0 && gameId) {
+          await fetch(`${API_BASE}/games/${gameId}/images`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(allScreenshots)
+          });
+        }
+        
+        showToast(id ? '更新成功' : '添加成功', 'success');
         closeGameModal();
         loadGames();
       } catch (e) {
-        showToast('保存失败', 'error');
+        showToast('保存失败: ' + e.message, 'error');
       }
     }
     
