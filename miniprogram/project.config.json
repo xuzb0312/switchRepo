@@ -1,0 +1,11 @@
+{
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "game-share",
+  "description": "游戏分享小程序",
+  "appid": "your-appid",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/game-detail/game-detail"
+  ],
+  "window": {
+    "navigationBarTitleText": "游戏分享",
+    "navigationBarBackgroundColor": "#ff6b6b",
+    "navigationBarTextStyle": "white"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,33 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input placeholder="搜索游戏..." bindinput="onSearch" />
+  </view>
+
+  <!-- 平台筛选 -->
+  <scroll-view class="platforms" scroll-x>
+    <view class="platform-tag {{currentPlatform === item.value ? 'active' : ''}}" 
+          wx:for="{{platforms}}" 
+          wx:key="value"
+          bindtap="onSelectPlatform"
+          data-platform="{{item.value}}">
+      {{item.name}}
+    </view>
+  </scroll-view>
+
+  <!-- 游戏列表 -->
+  <view class="game-list">
+    <view class="game-card" wx:for="{{games}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <image class="game-cover" src="{{item.coverImage}}" mode="aspectFill" />
+      <view class="game-info">
+        <text class="game-name">{{item.name}}</text>
+        <text class="game-platform">{{item.platform}}</text>
+        <text class="game-desc">{{item.description}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{games.length === 0}}">
+    暂无游戏，试试其他筛选
+  </view>
+</view>

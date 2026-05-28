@@ -1,0 +1,38 @@
+<view class="container" wx:if="{{game}}">
+  <image class="cover" src="{{game.coverImage}}" mode="widthFix" />
+  
+  <view class="content">
+    <view class="header">
+      <text class="title">{{game.name}}</text>
+      <text class="platform">{{game.platform}}</text>
+    </view>
+    
+    <view class="section">
+      <text class="section-title">游戏简介</text>
+      <text class="desc">{{game.description}}</text>
+    </view>
+    
+    <view class="section">
+      <text class="section-title">下载链接</text>
+      <view class="download-list">
+        <view class="download-item" wx:for="{{game.downloadLinks}}" wx:key="id">
+          <view class="link-info">
+            <text class="link-type">{{item.type}}</text>
+            <text class="link-name">{{item.name}}</text>
+          </view>
+          <button class="btn-download" bindtap="copyLink" data-url="{{item.url}}">
+            复制链接
+          </button>
+        </view>
+      </view>
+    </view>
+    
+    <view class="section" wx:if="{{game.images && game.images.length > 0}}">
+      <text class="section-title">截图预览</text>
+      <scroll-view scroll-x>
+        <image wx:for="{{game.images}}" wx:key="index" 
+               src="{{item}}" mode="aspectFill" class="screenshot" />
+      </scroll-view>
+    </view>
+  </view>
+</view>
