@@ -1,21 +1,25 @@
 const app = getApp()
 
+const API_BASE = 'http://localhost:8080/api'
+
 function request(url, data = {}, method = 'GET') {
   return new Promise((resolve, reject) => {
     wx.request({
-      url: app.globalData.apiBase + url,
+      url: API_BASE + url,
       data,
       method,
-      header: {
-        'Content-Type': 'application/json'
-      },
+      header: { 'Content-Type': 'application/json' },
       success: resolve,
       fail: reject
     })
   })
 }
 
-function getGames(params) {
+function getBanners() {
+  return request('/banners')
+}
+
+function getGames(params = {}) {
   return request('/games', params)
 }
 
@@ -27,8 +31,14 @@ function login(code) {
   return request('/auth/login', { code }, 'POST')
 }
 
+function getUserInfo() {
+  return request('/user/info')
+}
+
 module.exports = {
+  getBanners,
   getGames,
   getGameDetail,
-  login
+  login,
+  getUserInfo
 }

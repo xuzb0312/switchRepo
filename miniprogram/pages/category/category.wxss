@@ -1,0 +1,14 @@
+.container {
+  padding: 20rpx;
+  background: #121212;
+  min-height: 100vh;
+}
+
+.result-header {
+  margin-bottom: 20rpx;
+}
+
+.result-count {
+  font-size: 24rpx;
+  color: #888;
+}

@@ -1,0 +1,68 @@
+<view class="container">
+  <!-- 未登录状态 -->
+  <view class="login-card" wx:if="{{!userInfo}}">
+    <view class="login-icon">👤</view>
+    <text class="login-tip">当前页面需要登录后才能继续</text>
+    <view class="btn-login" bindtap="onLogin">微信登录</view>
+  </view>
+
+  <!-- 已登录状态 -->
+  <block wx:else>
+    <!-- 用户信息卡片 -->
+    <view class="user-card">
+      <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" />
+      <view class="user-info">
+        <text class="nickname">{{userInfo.nickname}}</text>
+        <text class="level">Lv{{userInfo.level || 1}}</text>
+      </view>
+    </view>
+
+    <!-- 统计数据 -->
+    <view class="stats-card">
+      <view class="stat-item">
+        <text class="stat-value">{{stats.gameCount}}</text>
+        <text class="stat-label">收藏游戏</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.downloadCount}}</text>
+        <text class="stat-label">下载次数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.shareCount}}</text>
+        <text class="stat-label">分享次数</text>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-list">
+      <view class="menu-item" bindtap="onMenuTap" data-type="favorites">
+        <text class="menu-icon">⭐</text>
+        <text class="menu-text">我的收藏</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="downloads">
+        <text class="menu-icon">📥</text>
+        <text class="menu-text">下载记录</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="shares">
+        <text class="menu-icon">🔗</text>
+        <text class="menu-text">我的分享</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="feedback">
+        <text class="menu-icon">💬</text>
+        <text class="menu-text">意见反馈</text>
+        <text class="menu-arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="about">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-text">关于我们</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="btn-logout" bindtap="onLogout">退出登录</view>
+  </block>
+</view>

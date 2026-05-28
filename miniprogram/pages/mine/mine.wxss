@@ -1,0 +1,147 @@
+.container {
+  padding: 20rpx;
+  background: #121212;
+  min-height: 100vh;
+}
+
+/* 未登录 */
+.login-card {
+  background: #1e1e1e;
+  border-radius: 16rpx;
+  padding: 80rpx 40rpx;
+  text-align: center;
+  margin-top: 100rpx;
+}
+
+.login-icon {
+  font-size: 100rpx;
+  margin-bottom: 30rpx;
+}
+
+.login-tip {
+  display: block;
+  color: #888;
+  font-size: 28rpx;
+  margin-bottom: 40rpx;
+}
+
+.btn-login {
+  background: #4CAF50;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 24rpx 80rpx;
+  border-radius: 40rpx;
+  display: inline-block;
+}
+
+/* 用户卡片 */
+.user-card {
+  background: #1e1e1e;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.nickname {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 8rpx;
+}
+
+.level {
+  display: inline-block;
+  background: #FFD700;
+  color: #1a1a1a;
+  font-size: 22rpx;
+  font-weight: bold;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+/* 统计数据 */
+.stats-card {
+  background: #1e1e1e;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20rpx;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FFD700;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #888;
+}
+
+/* 菜单列表 */
+.menu-list {
+  background: #1e1e1e;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #2a2a2a;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #fff;
+}
+
+.menu-arrow {
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 退出登录 */
+.btn-logout {
+  background: #2a2a2a;
+  color: #888;
+  font-size: 28rpx;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 16rpx;
+}

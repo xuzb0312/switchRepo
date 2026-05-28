@@ -1,27 +1,11 @@
 <view class="container">
-  <!-- 顶部标题栏 -->
-  <view class="header">
-    <text class="logo">🎮 游戏分享</text>
-  </view>
-
-  <!-- 搜索栏 -->
+  <!-- 顶部搜索 -->
   <view class="search-bar" bindtap="onSearchTap">
     <text class="icon">🔍</text>
-    <input placeholder="搜索游戏名称..." placeholder-class="placeholder" bindinput="onSearch" />
+    <input placeholder="搜索游戏..." placeholder-class="placeholder" bindinput="onSearch" />
   </view>
 
-  <!-- Banner轮播 -->
-  <swiper class="banner" indicator-dots autoplay circular indicator-color="rgba(255,255,255,0.3)" indicator-active-color="#FFD700">
-    <swiper-item wx:for="{{banners}}" wx:key="id">
-      <image src="{{item.image}}" mode="aspectFill" class="banner-img" />
-      <view class="banner-info">
-        <text class="banner-title">{{item.title}}</text>
-        <text class="banner-sub">{{item.subtitle}}</text>
-      </view>
-    </swiper-item>
-  </swiper>
-
-  <!-- 平台快捷筛选 -->
+  <!-- 平台筛选 -->
   <scroll-view class="platforms" scroll-x>
     <text class="platform-tag {{currentPlatform === item.value ? 'active' : ''}}" 
           wx:for="{{platforms}}" 
@@ -30,10 +14,9 @@
           data-platform="{{item.value}}">{{item.name}}</text>
   </scroll-view>
 
-  <!-- 最新上架标题 -->
-  <view class="section-header">
-    <text class="section-title">最新上架</text>
-    <text class="section-more" bindtap="onViewMore">更多 ></text>
+  <!-- 结果统计 -->
+  <view class="result-header">
+    <text class="result-count">{{games.length}} 个结果</text>
   </view>
 
   <!-- 游戏列表 -->
@@ -54,11 +37,6 @@
 
   <!-- 空状态 -->
   <view class="empty" wx:if="{{games.length === 0 && !loading}}">
-    <text>暂无游戏，试试其他筛选</text>
-  </view>
-
-  <!-- 加载中 -->
-  <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
+    <text>暂无游戏</text>
   </view>
 </view>

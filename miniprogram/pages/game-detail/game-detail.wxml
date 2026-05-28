@@ -1,38 +1,50 @@
 <view class="container" wx:if="{{game}}">
+  <!-- 封面图 -->
   <image class="cover" src="{{game.coverImage}}" mode="widthFix" />
-  
-  <view class="content">
-    <view class="header">
-      <text class="title">{{game.name}}</text>
-      <text class="platform">{{game.platform}}</text>
-    </view>
-    
-    <view class="section">
-      <text class="section-title">游戏简介</text>
-      <text class="desc">{{game.description}}</text>
-    </view>
-    
-    <view class="section">
-      <text class="section-title">下载链接</text>
-      <view class="download-list">
-        <view class="download-item" wx:for="{{game.downloadLinks}}" wx:key="id">
-          <view class="link-info">
-            <text class="link-type">{{item.type}}</text>
-            <text class="link-name">{{item.name}}</text>
-          </view>
-          <button class="btn-download" bindtap="copyLink" data-url="{{item.url}}">
-            复制链接
-          </button>
-        </view>
-      </view>
-    </view>
-    
-    <view class="section" wx:if="{{game.images && game.images.length > 0}}">
-      <text class="section-title">截图预览</text>
-      <scroll-view scroll-x>
-        <image wx:for="{{game.images}}" wx:key="index" 
-               src="{{item}}" mode="aspectFill" class="screenshot" />
-      </scroll-view>
+
+  <!-- 基本信息 -->
+  <view class="card info-card">
+    <text class="title">{{game.name}}</text>
+    <view class="tags">
+      <text class="tag">{{game.platform}}</text>
+      <text class="tag" wx:if="{{game.type}}">{{game.type}}</text>
     </view>
   </view>
+
+  <!-- 游戏简介 -->
+  <view class="card" wx:if="{{game.description}}">
+    <text class="card-title">游戏简介</text>
+    <text class="desc">{{game.description}}</text>
+  </view>
+
+  <!-- 下载链接 -->
+  <view class="card" wx:if="{{game.downloadLinks && game.downloadLinks.length > 0}}">
+    <text class="card-title">下载链接</text>
+    <view class="download-list">
+      <view class="download-item" wx:for="{{game.downloadLinks}}" wx:key="id">
+        <view class="link-info">
+          <text class="link-type">{{item.type}}</text>
+          <text class="link-name">{{item.name || item.url}}</text>
+        </view>
+        <view class="btn-copy" bindtap="copyLink" data-url="{{item.url}}">复制链接</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 截图预览 -->
+  <view class="card" wx:if="{{game.images && game.images.length > 0}}">
+    <text class="card-title">截图预览</text>
+    <scroll-view scroll-x class="screenshots">
+      <image wx:for="{{game.images}}" wx:key="index" 
+             src="{{item}}" mode="aspectFill" 
+             class="screenshot" 
+             bindtap="previewImage" 
+             data-src="{{item}}" />
+    </scroll-view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading" wx:if="{{loading}}">
+  <text>加载中...</text>
 </view>

@@ -1,90 +1,86 @@
 .container {
   padding: 20rpx;
+  background: #121212;
+  min-height: 100vh;
 }
 
-.search-bar {
-  background: #fff;
+.header {
+  padding: 10rpx 0 20rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.logo {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFD700;
+}
+
+.banner {
+  height: 380rpx;
   border-radius: 16rpx;
-  padding: 20rpx 30rpx;
-  margin-bottom: 20rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  position: relative;
 }
 
-.search-bar input {
-  font-size: 28rpx;
+.banner-img {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30rpx;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+}
+
+.banner-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 6rpx;
+}
+
+.banner-sub {
+  font-size: 24rpx;
+  color: #FFD700;
 }
 
 .platforms {
   white-space: nowrap;
+  margin-bottom: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20rpx;
 }
 
-.platform-tag {
-  display: inline-block;
-  padding: 12rpx 28rpx;
-  background: #fff;
-  border-radius: 30rpx;
-  margin-right: 16rpx;
-  font-size: 26rpx;
-  color: #666;
-}
-
-.platform-tag.active {
-  background: #ff6b6b;
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
   color: #fff;
 }
 
-.game-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-}
-
-.game-card {
-  background: #fff;
-  border-radius: 16rpx;
-  overflow: hidden;
-  display: flex;
-}
-
-.game-cover {
-  width: 200rpx;
-  height: 200rpx;
-}
-
-.game-info {
-  flex: 1;
-  padding: 20rpx;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.game-name {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8rpx;
-}
-
-.game-platform {
-  font-size: 22rpx;
-  color: #ff6b6b;
-  margin-bottom: 12rpx;
-}
-
-.game-desc {
-  font-size: 24rpx;
+.section-more {
+  font-size: 26rpx;
   color: #888;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 
-.empty-tip {
+.game-list {
+  padding-bottom: 20rpx;
+}
+
+.empty, .loading {
   text-align: center;
-  color: #999;
+  color: #666;
   padding: 100rpx 0;
   font-size: 28rpx;
 }
