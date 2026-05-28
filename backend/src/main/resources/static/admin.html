@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游戏分享 - 后台管理</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #121212; color: #fff; min-height: 100vh; }
+    
+    /* 头部 */
+    .header { background: #1e1e1e; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+    .header h1 { font-size: 24px; color: #FFD700; }
+    .header .user { color: #888; font-size: 14px; }
+    
+    /* 布局 */
+    .container { display: flex; min-height: calc(100vh - 61px); }
+    
+    /* 侧边栏 */
+    .sidebar { width: 200px; background: #1e1e1e; padding: 20px 0; }
+    .nav-item { padding: 14px 30px; cursor: pointer; color: #888; transition: all 0.2s; }
+    .nav-item:hover, .nav-item.active { background: #2a2a2a; color: #FFD700; border-left: 3px solid #FFD700; }
+    
+    /* 主内容 */
+    .main { flex: 1; padding: 30px; }
+    
+    /* 搜索栏 */
+    .toolbar { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; }
+    .search-input { background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 10px 16px; color: #fff; width: 250px; }
+    .search-input:focus { outline: none; border-color: #FFD700; }
+    select { background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 10px 16px; color: #fff; }
+    .btn { padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #FFD700; color: #1a1a1a; font-weight: bold; }
+    .btn-primary:hover { background: #ffcc00; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-secondary { background: #2a2a2a; color: #fff; border: 1px solid #444; }
+    .btn-secondary:hover { background: #3a3a3a; }
+    
+    /* 表格 */
+    .table-container { background: #1e1e1e; border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid #2a2a2a; }
+    th { background: #252525; color: #888; font-weight: 500; font-size: 14px; }
+    td { font-size: 14px; }
+    tr:hover td { background: #252525; }
+    .cover-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+    .status-1 { background: #2a4a2a; color: #4ade80; }
+    .status-0 { background: #4a2a2a; color: #f87171; }
+    .action-btns { display: flex; gap: 8px; }
+    .action-btns .btn { padding: 6px 14px; font-size: 12px; }
+    
+    /* 分页 */
+    .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
+    .pagination button { padding: 8px 14px; border-radius: 6px; border: 1px solid #333; background: #1e1e1e; color: #888; cursor: pointer; }
+    .pagination button.active { background: #FFD700; color: #1a1a1a; border-color: #FFD700; }
+    .pagination button:hover:not(.active) { background: #2a2a2a; }
+    
+    /* 模态框 */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: #1e1e1e; border-radius: 16px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 20px 30px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 18px; }
+    .modal-close { background: none; border: none; color: #888; font-size: 28px; cursor: pointer; }
+    .modal-close:hover { color: #fff; }
+    .modal-body { padding: 30px; }
+    
+    /* 表单 */
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: #888; font-size: 14px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #FFD700; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    /* 标签输入 */
+    .tags-input { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; background: #2a2a2a; border: 1px solid #333; border-radius: 8px; }
+    .tags-input input { flex: 1; min-width: 120px; border: none; background: transparent; padding: 4px; }
+    .tags-input input:focus { outline: none; }
+    .tag-item { display: flex; align-items: center; gap: 6px; background: #3a3a3a; padding: 4px 10px; border-radius: 6px; font-size: 13px; }
+    .tag-item button { background: none; border: none; color: #888; cursor: pointer; font-size: 16px; }
+    
+    /* 链接输入 */
+    .links-container { display: flex; flex-direction: column; gap: 12px; }
+    .link-item { display: flex; gap: 10px; align-items: center; background: #2a2a2a; padding: 10px; border-radius: 8px; }
+    .link-item input { flex: 1; background: #1e1e1e; }
+    
+    /* Toast */
+    .toast { position: fixed; top: 80px; right: 30px; background: #1e1e1e; border-left: 4px solid #FFD700; padding: 16px 24px; border-radius: 8px; display: none; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .toast.show { display: block; }
+    .toast.success { border-color: #4ade80; }
+    .toast.error { border-color: #f87171; }
+    
+    /* 空状态 */
+    .empty-state { text-align: center; padding: 60px 0; color: #666; }
+    
+    /* 确认框 */
+    .confirm-modal .modal-content { max-width: 400px; }
+    .confirm-modal .modal-body { text-align: center; padding: 40px; }
+    .confirm-modal .confirm-text { font-size: 16px; margin-bottom: 30px; color: #ccc; }
+    .confirm-modal .confirm-btns { display: flex; gap: 15px; justify-content: center; }
+  </style>
+</head>
+<body>
+  <!-- 头部 -->
+  <div class="header">
+    <h1>🎮 游戏分享 管理后台</h1>
+    <div class="user">管理员</div>
+  </div>
+  
+  <div class="container">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="nav-item active" onclick="showSection('games')">🎮 游戏管理</div>
+      <div class="nav-item" onclick="showSection('banners')">📢 Banner管理</div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div class="main">
+      <!-- 游戏管理 -->
+      <div id="games-section">
+        <div class="toolbar">
+          <input type="text" class="search-input" placeholder="搜索游戏名称..." id="searchInput" oninput="loadGames()">
+          <select id="platformFilter" onchange="loadGames()">
+            <option value="">全部平台</option>
+            <option value="Switch">Switch</option>
+            <option value="PS5">PS5</option>
+            <option value="PS4">PS4</option>
+            <option value="Xbox">Xbox</option>
+            <option value="PC">PC</option>
+            <option value="tool">工具</option>
+          </select>
+          <button class="btn btn-primary" onclick="openGameModal()">+ 添加游戏</button>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>封面</th>
+                <th>名称</th>
+                <th>平台</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>浏览</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="gamesTableBody">
+              <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="pagination" id="gamesPagination"></div>
+      </div>
+      
+      <!-- Banner管理 -->
+      <div id="banners-section" style="display:none;">
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openBannerModal()">+ 添加Banner</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>图片</th>
+                <th>标题</th>
+                <th>副标题</th>
+                <th>排序</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="bannersTableBody">
+              <tr><td colspan="6" class="empty-state">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 游戏编辑弹窗 -->
+  <div class="modal" id="gameModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="gameModalTitle">添加游戏</h3>
+        <button class="modal-close" onclick="closeGameModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="gameId">
+        <div class="form-group">
+          <label>游戏名称 *</label>
+          <input type="text" id="gameName" placeholder="例如：宝可梦 朱">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>平台 *</label>
+            <select id="gamePlatform">
+              <option value="Switch">Switch</option>
+              <option value="PS5">PS5</option>
+              <option value="PS4">PS4</option>
+              <option value="Xbox">Xbox</option>
+              <option value="PC">PC</option>
+              <option value="tool">工具</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>类型</label>
+            <input type="text" id="gameType" placeholder="例如：NSZ、pkg">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>封面图片URL</label>
+          <input type="text" id="gameCoverImage" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>游戏简介</label>
+          <textarea id="gameDescription" placeholder="游戏描述..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>状态</label>
+          <select id="gameStatus">
+            <option value="1">已发布</option>
+            <option value="0">待审核</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>下载链接</label>
+          <div class="links-container" id="linksContainer">
+            <div class="link-item">
+              <input type="text" placeholder="类型(阿里云盘/百度网盘/磁力链)" class="link-type">
+              <input type="text" placeholder="名称" class="link-name">
+              <input type="text" placeholder="链接URL" class="link-url">
+              <button class="btn btn-secondary" onclick="addLinkInput()">+</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="saveGame()">保存</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Banner编辑弹窗 -->
+  <div class="modal" id="bannerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="bannerModalTitle">添加Banner</h3>
+        <button class="modal-close" onclick="closeBannerModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="bannerId">
+        <div class="form-group">
+          <label>标题 *</label>
+          <input type="text" id="bannerTitle" placeholder="Banner标题">
+        </div>
+        <div class="form-group">
+          <label>副标题</label>
+          <input type="text" id="bannerSubtitle" placeholder="副标题">
+        </div>
+        <div class="form-group">
+          <label>图片URL *</label>
+          <input type="text" id="bannerImage" placeholder="https://...">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>跳转类型</label>
+            <select id="bannerLinkType">
+              <option value="none">不跳转</option>
+              <option value="game">跳转游戏</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>排序</label>
+            <input type="number" id="bannerSort" value="0">
+          </div>
+        </div>
+        <div class="form-group" id="bannerLinkValueGroup" style="display:none;">
+          <label>关联游戏ID</label>
+          <input type="number" id="bannerLinkValue" placeholder="游戏ID">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="saveBanner()">保存</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 确认删除弹窗 -->
+  <div class="modal confirm-modal" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p class="confirm-text" id="confirmText">确定要删除吗？</p>
+        <div class="confirm-btns">
+          <button class="btn btn-secondary" onclick="closeConfirmModal()">取消</button>
+          <button class="btn btn-danger" id="confirmBtn">删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast提示 -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:8080/api';
+    let currentPage = 1;
+    let gamesCache = [];
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGames();
+      loadBanners();
+      
+      document.getElementById('bannerLinkType').addEventListener('change', (e) => {
+        document.getElementById('bannerLinkValueGroup').style.display = e.target.value === 'game' ? 'block' : 'none';
+      });
+    });
+    
+    // 切换区块
+    function showSection(section) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('games-section').style.display = section === 'games' ? 'block' : 'none';
+      document.getElementById('banners-section').style.display = section === 'banners' ? 'block' : 'none';
+    }
+    
+    // 加载游戏列表
+    async function loadGames() {
+      const search = document.getElementById('searchInput').value;
+      const platform = document.getElementById('platformFilter').value;
+      
+      try {
+        const res = await fetch(`${API_BASE}/games?keyword=${search}&platform=${platform}`);
+        const json = await res.json();
+        gamesCache = json.data || [];
+        renderGames(gamesCache);
+      } catch (e) {
+        showToast('加载失败: ' + e.message, 'error');
+      }
+    }
+    
+    // 渲染游戏表格
+    function renderGames(games) {
+      const tbody = document.getElementById('gamesTableBody');
+      if (games.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+        return;
+      }
+      tbody.innerHTML = games.map(g => `
+        <tr>
+          <td><img src="${g.coverImage || 'https://picsum.photos/60/60'}" class="cover-thumb" onerror="this.src='https://picsum.photos/60/60'"></td>
+          <td>${g.name}</td>
+          <td>${g.platform}</td>
+          <td>${g.type || '-'}</td>
+          <td><span class="status-badge status-${g.status}">${g.status === 1 ? '已发布' : '待审核'}</span></td>
+          <td>${g.viewCount || 0}</td>
+          <td class="action-btns">
+            <button class="btn btn-secondary" onclick="editGame(${g.id})">编辑</button>
+            <button class="btn btn-danger" onclick="confirmDelete('确定删除游戏《${g.name}》？', () => deleteGame(${g.id}))">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    // 打开游戏弹窗
+    function openGameModal(id = null) {
+      document.getElementById('gameId').value = '';
+      document.getElementById('gameName').value = '';
+      document.getElementById('gamePlatform').value = 'Switch';
+      document.getElementById('gameType').value = '';
+      document.getElementById('gameCoverImage').value = '';
+      document.getElementById('gameDescription').value = '';
+      document.getElementById('gameStatus').value = '1';
+      document.getElementById('linksContainer').innerHTML = `
+        <div class="link-item">
+          <input type="text" placeholder="类型" class="link-type">
+          <input type="text" placeholder="名称" class="link-name">
+          <input type="text" placeholder="链接URL" class="link-url">
+          <button class="btn btn-secondary" onclick="addLinkInput()">+</button>
+        </div>
+      `;
+      
+      if (id) {
+        document.getElementById('gameModalTitle').textContent = '编辑游戏';
+        const game = gamesCache.find(g => g.id === id);
+        if (game) {
+          document.getElementById('gameId').value = game.id;
+          document.getElementById('gameName').value = game.name;
+          document.getElementById('gamePlatform').value = game.platform;
+          document.getElementById('gameType').value = game.type || '';
+          document.getElementById('gameCoverImage').value = game.coverImage || '';
+          document.getElementById('gameDescription').value = game.description || '';
+          document.getElementById('gameStatus').value = game.status;
+          // 加载下载链接
+          loadGameLinks(game.id);
+        }
+      } else {
+        document.getElementById('gameModalTitle').textContent = '添加游戏';
+      }
+      
+      document.getElementById('gameModal').classList.add('show');
+    }
+    
+    // 加载游戏下载链接
+    async function loadGameLinks(gameId) {
+      try {
+        const res = await fetch(`${API_BASE}/games/${gameId}`);
+        const json = await res.json();
+        const links = json.data.downloadLinks || [];
+        if (links.length > 0) {
+          document.getElementById('linksContainer').innerHTML = links.map(l => `
+            <div class="link-item">
+              <input type="text" value="${l.type}" class="link-type">
+              <input type="text" value="${l.name}" class="link-name">
+              <input type="text" value="${l.url}" class="link-url">
+              <button class="btn btn-danger" onclick="this.parentElement.remove()">×</button>
+            </div>
+          `).join('') + `
+            <div class="link-item">
+              <input type="text" placeholder="类型" class="link-type">
+              <input type="text" placeholder="名称" class="link-name">
+              <input type="text" placeholder="链接URL" class="link-url">
+              <button class="btn btn-secondary" onclick="addLinkInput()">+</button>
+            </div>
+          `;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    function addLinkInput() {
+      const container = document.getElementById('linksContainer');
+      const lastItem = container.querySelector('.link-item:last-child');
+      if (lastItem) {
+        lastItem.querySelector('.btn-secondary').textContent = '×';
+        lastItem.querySelector('.btn-secondary').className = 'btn btn-danger';
+        lastItem.querySelector('.btn-secondary').onclick = function() { this.parentElement.remove(); };
+      }
+      const newItem = document.createElement('div');
+      newItem.className = 'link-item';
+      newItem.innerHTML = `
+        <input type="text" placeholder="类型" class="link-type">
+        <input type="text" placeholder="名称" class="link-name">
+        <input type="text" placeholder="链接URL" class="link-url">
+        <button class="btn btn-secondary" onclick="addLinkInput()">+</button>
+      `;
+      container.appendChild(newItem);
+    }
+    
+    // 保存游戏
+    async function saveGame() {
+      const id = document.getElementById('gameId').value;
+      const game = {
+        name: document.getElementById('gameName').value,
+        platform: document.getElementById('gamePlatform').value,
+        type: document.getElementById('gameType').value,
+        coverImage: document.getElementById('gameCoverImage').value,
+        description: document.getElementById('gameDescription').value,
+        status: parseInt(document.getElementById('gameStatus').value)
+      };
+      
+      if (!game.name) {
+        showToast('请填写游戏名称', 'error');
+        return;
+      }
+      
+      try {
+        if (id) {
+          await fetch(`${API_BASE}/games/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(game)
+          });
+          showToast('更新成功', 'success');
+        } else {
+          await fetch(`${API_BASE}/games`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(game)
+          });
+          showToast('添加成功', 'success');
+        }
+        
+        // 保存下载链接（简化处理）
+        closeGameModal();
+        loadGames();
+      } catch (e) {
+        showToast('保存失败', 'error');
+      }
+    }
+    
+    // 编辑游戏
+    function editGame(id) {
+      openGameModal(id);
+    }
+    
+    // 删除游戏
+    async function deleteGame(id) {
+      try {
+        await fetch(`${API_BASE}/games/${id}`, { method: 'DELETE' });
+        showToast('删除成功', 'success');
+        loadGames();
+      } catch (e) {
+        showToast('删除失败', 'error');
+      }
+    }
+    
+    function closeGameModal() {
+      document.getElementById('gameModal').classList.remove('show');
+    }
+    
+    // Banner管理
+    async function loadBanners() {
+      try {
+        const res = await fetch(`${API_BASE}/banners`);
+        const json = await res.json();
+        renderBanners(json.data || []);
+      } catch (e) {
+        showToast('加载Banner失败', 'error');
+      }
+    }
+    
+    function renderBanners(banners) {
+      const tbody = document.getElementById('bannersTableBody');
+      if (banners.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+        return;
+      }
+      tbody.innerHTML = banners.map(b => `
+        <tr>
+          <td><img src="${b.image}" style="width:100px;height:50px;object-fit:cover;border-radius:6px;" onerror="this.src='https://picsum.photos/100/50'"></td>
+          <td>${b.title}</td>
+          <td>${b.subtitle || '-'}</td>
+          <td>${b.sort}</td>
+          <td><span class="status-badge status-${b.status}">${b.status === 1 ? '启用' : '禁用'}</span></td>
+          <td class="action-btns">
+            <button class="btn btn-secondary" onclick="editBanner(${b.id})">编辑</button>
+            <button class="btn btn-danger" onclick="confirmDelete('确定删除Banner？', () => deleteBanner(${b.id}))">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function openBannerModal(id = null) {
+      document.getElementById('bannerId').value = '';
+      document.getElementById('bannerTitle').value = '';
+      document.getElementById('bannerSubtitle').value = '';
+      document.getElementById('bannerImage').value = '';
+      document.getElementById('bannerLinkType').value = 'none';
+      document.getElementById('bannerSort').value = '0';
+      document.getElementById('bannerLinkValue').value = '';
+      document.getElementById('bannerLinkValueGroup').style.display = 'none';
+      document.getElementById('bannerModalTitle').textContent = '添加Banner';
+      document.getElementById('bannerModal').classList.add('show');
+    }
+    
+    function closeBannerModal() {
+      document.getElementById('bannerModal').classList.remove('show');
+    }
+    
+    async function saveBanner() {
+      const title = document.getElementById('bannerTitle').value;
+      if (!title) {
+        showToast('请填写标题', 'error');
+        return;
+      }
+      const banner = {
+        title: title,
+        subtitle: document.getElementById('bannerSubtitle').value,
+        image: document.getElementById('bannerImage').value,
+        linkType: document.getElementById('bannerLinkType').value,
+        linkValue: document.getElementById('bannerLinkValue').value,
+        sort: parseInt(document.getElementById('bannerSort').value) || 0,
+        status: 1
+      };
+      
+      try {
+        await fetch(`${API_BASE}/banners`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(banner)
+        });
+        showToast('保存成功', 'success');
+        closeBannerModal();
+        loadBanners();
+      } catch (e) {
+        showToast('保存失败', 'error');
+      }
+    }
+    
+    function editBanner(id) {
+      showToast('编辑功能开发中', 'info');
+    }
+    
+    async function deleteBanner(id) {
+      showToast('Banner删除功能开发中', 'info');
+    }
+    
+    // 确认弹窗
+    let confirmCallback = null;
+    function confirmDelete(text, callback) {
+      document.getElementById('confirmText').textContent = text;
+      confirmCallback = callback;
+      document.getElementById('confirmModal').classList.add('show');
+      document.getElementById('confirmBtn').onclick = () => {
+        if (confirmCallback) confirmCallback();
+        closeConfirmModal();
+      };
+    }
+    
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('show');
+      confirmCallback = null;
+    }
+    
+    // Toast提示
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    // 点击外部关闭弹窗
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
